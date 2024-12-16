@@ -38,6 +38,7 @@ export default defineConfig({
       },
     }),
   ],
+  base: '/payjoy/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
