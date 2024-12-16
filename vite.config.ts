@@ -37,6 +37,7 @@ export default defineConfig({
         ],
       },
     }),
+    base: '/payjoy/',
   ],
   resolve: {
     alias: {
