@@ -6,3 +6,4 @@ export { default as PaymentReminder } from './PaymentReminder';
 export { default as PWAPrompt } from './PWAPrompt';
 export { default as SalesFilter } from './SalesFilter';
 export { default as Logo } from './Logo';
+export { default as Payments } from './Payments';

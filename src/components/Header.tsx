@@ -26,6 +26,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Logo from './Logo';
 import { Sale } from '../types';
 import PaymentReminder from './PaymentReminder';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 
 interface HeaderProps {
   pendingSales?: Sale[];
@@ -83,9 +84,10 @@ const Header = ({ pendingSales = [] }: HeaderProps) => {
   });
 
   const navigationItems = [
-    { path: '/', icon: <DashboardIcon />, label: 'Dashboard' },
+    { path: '/dashboard', icon: <DashboardIcon />, label: 'Dashboard' },
     { path: '/sales/new', icon: <AddCircleIcon />, label: 'Nova Venda' },
     { path: '/sales', icon: <HistoryIcon />, label: 'Histórico' },
+    { path: '/payments', icon: <AttachMoneyIcon />, label: 'Pagamentos' },
   ];
 
   const drawer = (

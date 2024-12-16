@@ -20,11 +20,20 @@ import {
   DialogActions,
   Button,
   Stack,
+  Card,
+  CardContent,
+  Grid,
+  Divider,
 } from '@mui/material';
 import { format, isWithinInterval, startOfDay, endOfDay, subDays } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import PersonIcon from '@mui/icons-material/Person';
+import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import { Sale } from '../types';
 import { supabase } from '../lib/supabaseClient';
 import SalesFilter, { FilterOptions } from './SalesFilter';
@@ -132,7 +141,11 @@ const SalesList = ({ sales: initialSales, onUpdate }: SalesListProps) => {
   const handleMarkAsPaid = async (saleId: number) => {
     const { error } = await supabase
       .from('sales')
-      .update({ status: 'paid', remaining_amount: 0 })
+      .update({ 
+        status: 'paid', 
+        remaining_amount: 0,
+        updated_at: new Date().toISOString()
+      })
       .eq('id', saleId);
 
     if (!error) {
@@ -182,40 +195,221 @@ const SalesList = ({ sales: initialSales, onUpdate }: SalesListProps) => {
     }).format(value);
   };
 
+  const MobileCard = ({ sale }: { sale: Sale }) => (
+    <Card
+      elevation={0}
+      sx={{
+        mb: 2,
+        border: '1px solid',
+        borderColor: 'grey.200',
+      }}
+    >
+      <CardContent>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <PersonIcon color="action" />
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Cliente
+                  </Typography>
+                  <Typography variant="body1" fontWeight={500}>
+                    {sale.customer_name}
+                  </Typography>
+                </Box>
+              </Box>
+              <Chip
+                label={sale.status === 'pending' ? 'Pendente' : 'Pago'}
+                color={sale.status === 'pending' ? 'warning' : 'success'}
+                size="small"
+              />
+            </Stack>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Stack direction="row" spacing={2}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <PhoneAndroidIcon color="action" />
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Aparelho
+                  </Typography>
+                  <Typography variant="body2">
+                    {sale.device_name}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    IMEI: {sale.imei}
+                  </Typography>
+                </Box>
+              </Box>
+            </Stack>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Box>
+              <Typography variant="subtitle2" color="text.secondary">
+                Vendedor
+              </Typography>
+              <Typography variant="body2">
+                {sale.seller_name}
+              </Typography>
+            </Box>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Stack direction="row" spacing={2} justifyContent="space-between">
+              <Box>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Data da Venda
+                </Typography>
+                <Typography variant="body2">
+                  {format(new Date(sale.sale_date), 'dd/MM/yyyy')}
+                </Typography>
+              </Box>
+              <Box>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Data do Vencimento
+                </Typography>
+                <Typography 
+                  variant="body2" 
+                  color={sale.status === 'pending' ? 'warning.main' : 'text.secondary'}
+                >
+                  {format(new Date(sale.payment_due_date), 'dd/MM/yyyy')}
+                </Typography>
+              </Box>
+            </Stack>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Stack direction="row" spacing={2} justifyContent="space-between">
+              <Box>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Valor Total
+                </Typography>
+                <Typography variant="body1" fontWeight={500}>
+                  {formatCurrency(sale.total_amount)}
+                </Typography>
+              </Box>
+              <Box>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Restante
+                </Typography>
+                <Typography 
+                  variant="body1" 
+                  fontWeight={500}
+                  color={sale.remaining_amount > 0 ? 'warning.main' : 'success.main'}
+                >
+                  {formatCurrency(sale.remaining_amount)}
+                </Typography>
+              </Box>
+            </Stack>
+          </Grid>
+
+          {sale.status === 'paid' && (
+            <Grid item xs={12}>
+              <Box>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Data do Pagamento
+                </Typography>
+                <Typography variant="body2" color="success.main">
+                  {format(new Date(sale.updated_at || sale.created_at), 'dd/MM/yyyy')}
+                </Typography>
+              </Box>
+            </Grid>
+          )}
+
+          <Grid item xs={12}>
+            <Divider sx={{ my: 1 }} />
+            <Stack direction="row" spacing={1} justifyContent="flex-end">
+              {sale.status === 'pending' && (
+                <Tooltip title="Marcar como pago">
+                  <IconButton
+                    color="success"
+                    size="small"
+                    onClick={() => handleMarkAsPaid(sale.id)}
+                  >
+                    <CheckCircleIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+              <Tooltip title="Editar venda">
+                <IconButton
+                  color="primary"
+                  size="small"
+                  onClick={() => handleEditClick(sale)}
+                >
+                  <EditIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Excluir venda">
+                <IconButton
+                  color="error"
+                  size="small"
+                  onClick={() => handleDeleteClick(sale)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Tooltip>
+            </Stack>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <Box>
       <SalesFilter onFilterChange={handleFilterChange} />
       
-      <TableContainer 
-        component={Paper} 
-        elevation={0}
-        sx={{ 
-          border: '1px solid',
-          borderColor: 'grey.200',
-        }}
-      >
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Data</TableCell>
-              <TableCell>Cliente</TableCell>
-              {!isMobile && <TableCell>Vendedor</TableCell>}
-              {!isMobile && <TableCell>Aparelho</TableCell>}
-              <TableCell align="right">Valor Total</TableCell>
-              <TableCell align="right">Restante</TableCell>
-              <TableCell align="center">Status</TableCell>
-              <TableCell align="center">Ações</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredSales.map((sale) => (
-              <TableRow key={sale.id}>
-                <TableCell>
-                  {format(new Date(sale.sale_date), 'dd/MM/yyyy')}
-                </TableCell>
-                <TableCell>{sale.customer_name}</TableCell>
-                {!isMobile && <TableCell>{sale.seller_name}</TableCell>}
-                {!isMobile && (
+      {isMobile ? (
+        <Box sx={{ px: 2 }}>
+          {filteredSales.map((sale) => (
+            <MobileCard key={sale.id} sale={sale} />
+          ))}
+          {filteredSales.length === 0 && (
+            <Typography 
+              variant="body1" 
+              color="text.secondary"
+              textAlign="center"
+              sx={{ py: 4 }}
+            >
+              Nenhuma venda encontrada
+            </Typography>
+          )}
+        </Box>
+      ) : (
+        <TableContainer 
+          component={Paper} 
+          elevation={0}
+          sx={{ 
+            border: '1px solid',
+            borderColor: 'grey.200',
+          }}
+        >
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Data da Venda</TableCell>
+                <TableCell>Cliente</TableCell>
+                <TableCell>Vendedor</TableCell>
+                <TableCell>Aparelho</TableCell>
+                <TableCell align="right">Valor Total</TableCell>
+                <TableCell align="right">Restante</TableCell>
+                <TableCell>Vencimento</TableCell>
+                <TableCell>Data Pagamento</TableCell>
+                <TableCell align="center">Status</TableCell>
+                <TableCell align="center">Ações</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredSales.map((sale) => (
+                <TableRow key={sale.id}>
+                  <TableCell>
+                    {format(new Date(sale.sale_date), 'dd/MM/yyyy')}
+                  </TableCell>
+                  <TableCell>{sale.customer_name}</TableCell>
+                  <TableCell>{sale.seller_name}</TableCell>
                   <TableCell>
                     <Typography variant="body2" color="text.primary">
                       {sale.device_name}
@@ -224,67 +418,78 @@ const SalesList = ({ sales: initialSales, onUpdate }: SalesListProps) => {
                       IMEI: {sale.imei}
                     </Typography>
                   </TableCell>
-                )}
-                <TableCell align="right">
-                  {formatCurrency(sale.total_amount)}
-                </TableCell>
-                <TableCell align="right">
-                  {formatCurrency(sale.remaining_amount)}
-                </TableCell>
-                <TableCell align="center">
-                  <Chip
-                    label={sale.status === 'pending' ? 'Pendente' : 'Pago'}
-                    color={sale.status === 'pending' ? 'warning' : 'success'}
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell align="center">
-                  <Stack direction="row" spacing={1} justifyContent="center">
-                    {sale.status === 'pending' && (
-                      <Tooltip title="Marcar como pago">
+                  <TableCell align="right">
+                    {formatCurrency(sale.total_amount)}
+                  </TableCell>
+                  <TableCell align="right">
+                    {formatCurrency(sale.remaining_amount)}
+                  </TableCell>
+                  <TableCell>
+                    <Typography 
+                      variant="body2" 
+                      color={sale.status === 'pending' ? 'warning.main' : 'text.secondary'}
+                    >
+                      {format(new Date(sale.payment_due_date), 'dd/MM/yyyy')}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    {sale.status === 'paid' && format(new Date(sale.updated_at || sale.created_at), 'dd/MM/yyyy')}
+                  </TableCell>
+                  <TableCell align="center">
+                    <Chip
+                      label={sale.status === 'pending' ? 'Pendente' : 'Pago'}
+                      color={sale.status === 'pending' ? 'warning' : 'success'}
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell align="center">
+                    <Stack direction="row" spacing={1} justifyContent="center">
+                      {sale.status === 'pending' && (
+                        <Tooltip title="Marcar como pago">
+                          <IconButton
+                            color="success"
+                            size="small"
+                            onClick={() => handleMarkAsPaid(sale.id)}
+                          >
+                            <CheckCircleIcon />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                      <Tooltip title="Editar venda">
                         <IconButton
-                          color="success"
+                          color="primary"
                           size="small"
-                          onClick={() => handleMarkAsPaid(sale.id)}
+                          onClick={() => handleEditClick(sale)}
                         >
-                          <CheckCircleIcon />
+                          <EditIcon />
                         </IconButton>
                       </Tooltip>
-                    )}
-                    <Tooltip title="Editar venda">
-                      <IconButton
-                        color="primary"
-                        size="small"
-                        onClick={() => handleEditClick(sale)}
-                      >
-                        <EditIcon />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Excluir venda">
-                      <IconButton
-                        color="error"
-                        size="small"
-                        onClick={() => handleDeleteClick(sale)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </Stack>
-                </TableCell>
-              </TableRow>
-            ))}
-            {filteredSales.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
-                  <Typography variant="body1" color="text.secondary">
-                    Nenhuma venda encontrada
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                      <Tooltip title="Excluir venda">
+                        <IconButton
+                          color="error"
+                          size="small"
+                          onClick={() => handleDeleteClick(sale)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {filteredSales.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={9} align="center" sx={{ py: 4 }}>
+                    <Typography variant="body1" color="text.secondary">
+                      Nenhuma venda encontrada
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
       {/* Edit Sale Dialog */}
       <Dialog 

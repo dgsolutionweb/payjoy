@@ -11,6 +11,7 @@ export interface Sale {
   payment_due_date: string;
   status: 'pending' | 'paid';
   created_at: string;
+  updated_at?: string;
 }
 
 export interface SalesSummary {

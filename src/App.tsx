@@ -1,8 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Box } from '@mui/material';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { 
+  BrowserRouter as Router, 
+  Routes, 
+  Route, 
+  useLocation, 
+  Navigate 
+} from 'react-router-dom';
 import { supabase } from './lib/supabaseClient';
 import { Sale, SalesSummary } from './types';
 import {
@@ -12,6 +18,7 @@ import {
   Dashboard,
   PaymentReminder,
   PWAPrompt,
+  Payments,
 } from './components';
 
 const theme = createTheme({
@@ -21,6 +28,7 @@ const theme = createTheme({
       main: '#2563eb',
       light: '#3b82f6',
       dark: '#1d4ed8',
+      '50': '#eff6ff',
       '100': '#dbeafe',
       '200': '#bfdbfe',
     },
@@ -28,6 +36,9 @@ const theme = createTheme({
       main: '#db2777',
       light: '#ec4899',
       dark: '#be185d',
+      '50': '#fdf2f8',
+      '100': '#fce7f3',
+      '200': '#fbcfe8',
     },
     background: {
       default: '#f8fafc',
@@ -37,19 +48,25 @@ const theme = createTheme({
       main: '#059669',
       light: '#10b981',
       dark: '#047857',
+      '50': '#ecfdf5',
       '100': '#d1fae5',
+      '200': '#a7f3d0',
     },
     warning: {
       main: '#d97706',
       light: '#f59e0b',
       dark: '#b45309',
+      '50': '#fffbeb',
       '100': '#fef3c7',
+      '200': '#fde68a',
     },
     error: {
       main: '#dc2626',
       light: '#ef4444',
       dark: '#b91c1c',
+      '50': '#fef2f2',
       '100': '#fee2e2',
+      '200': '#fecaca',
     },
     grey: {
       50: '#f8fafc',
@@ -268,17 +285,11 @@ function AppContent() {
     total_received: 0,
     total_pending: 0,
   });
-  const [showInitialReminder, setShowInitialReminder] = useState(true);
   const location = useLocation();
 
   useEffect(() => {
     fetchSales();
   }, []);
-
-  useEffect(() => {
-    // Show reminder when route changes
-    setShowInitialReminder(true);
-  }, [location.pathname]);
 
   const fetchSales = async () => {
     const { data, error } = await supabase
@@ -297,7 +308,30 @@ function AppContent() {
     }
   };
 
-  const calculateSummary = (salesData: Sale[]) => {
+  const handleMarkAsPaid = useCallback(async (saleId: number) => {
+    try {
+      const { error } = await supabase
+        .from('sales')
+        .update({ 
+          status: 'paid', 
+          remaining_amount: 0,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', saleId);
+
+      if (error) {
+        console.error('Error marking sale as paid:', error);
+        return;
+      }
+
+      // Refresh sales data after successful update
+      await fetchSales();
+    } catch (error) {
+      console.error('Error in handleMarkAsPaid:', error);
+    }
+  }, []);
+
+  const calculateSummary = useCallback((salesData: Sale[]) => {
     const summary = salesData.reduce(
       (acc, sale) => {
         acc.total_sales += sale.total_amount;
@@ -309,13 +343,9 @@ function AppContent() {
       { total_sales: 0, devices_sold: 0, total_received: 0, total_pending: 0 }
     );
     setSummary(summary);
-  };
+  }, []);
 
-  const pendingSales = sales.filter(sale => sale.status === 'pending');
-
-  const handleInitialReminderClose = () => {
-    setShowInitialReminder(false);
-  };
+  const pendingSales = useMemo(() => sales.filter(sale => sale.status === 'pending'), [sales]);
 
   return (
     <Box sx={{ 
@@ -341,7 +371,8 @@ function AppContent() {
         }}
       >
         <Routes>
-          <Route path="/" element={<Dashboard sales={sales} summary={summary} />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<Dashboard sales={sales} summary={summary} />} />
           <Route
             path="/sales/new"
             element={<SaleForm onSaleComplete={fetchSales} />}
@@ -350,17 +381,13 @@ function AppContent() {
             path="/sales"
             element={<SalesList sales={sales} onUpdate={fetchSales} />}
           />
+          <Route
+            path="/payments"
+            element={<Payments sales={sales} onMarkAsPaid={handleMarkAsPaid} />}
+          />
         </Routes>
       </Box>
       <PWAPrompt />
-      
-      {/* Initial Payment Reminder */}
-      {showInitialReminder && pendingSales.length > 0 && (
-        <PaymentReminder
-          sales={pendingSales}
-          onClose={handleInitialReminderClose}
-        />
-      )}
     </Box>
   );
 }
@@ -369,7 +396,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
+      <Router basename="/payjoy">
         <AppContent />
       </Router>
     </ThemeProvider>
