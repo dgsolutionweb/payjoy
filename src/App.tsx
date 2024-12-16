@@ -307,14 +307,13 @@ function AppContent() {
 
   const handleMarkAsPaid = useCallback(async (saleId: number) => {
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('sales')
-        .update({ 
-          status: 'paid', 
-          remaining_amount: 0,
-          updated_at: new Date().toISOString()
+        .update({
+          status: 'paid',
+          remaining_amount: 0
         })
-        .eq('id', saleId);
+        .match({ id: saleId });
 
       if (error) {
         console.error('Error marking sale as paid:', error);

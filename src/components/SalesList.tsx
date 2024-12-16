@@ -136,17 +136,23 @@ const SalesList = ({ sales: initialSales, onUpdate }: SalesListProps) => {
   };
 
   const handleMarkAsPaid = async (saleId: number) => {
-    const { error } = await supabase
-      .from('sales')
-      .update({ 
-        status: 'paid', 
-        remaining_amount: 0,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', saleId);
+    try {
+      const { data, error } = await supabase
+        .from('sales')
+        .update({
+          status: 'paid',
+          remaining_amount: 0
+        })
+        .match({ id: saleId });
 
-    if (!error) {
+      if (error) {
+        console.error('Error marking sale as paid:', error);
+        return;
+      }
+
       onUpdate();
+    } catch (error) {
+      console.error('Error in handleMarkAsPaid:', error);
     }
   };
 
@@ -310,7 +316,7 @@ const SalesList = ({ sales: initialSales, onUpdate }: SalesListProps) => {
                   Data do Pagamento
                 </Typography>
                 <Typography variant="body2" color="success.main">
-                  {format(new Date(sale.updated_at || sale.created_at), 'dd/MM/yyyy')}
+                  {format(new Date(), 'dd/MM/yyyy')}
                 </Typography>
               </Box>
             </Grid>
@@ -430,7 +436,7 @@ const SalesList = ({ sales: initialSales, onUpdate }: SalesListProps) => {
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    {sale.status === 'paid' && format(new Date(sale.updated_at || sale.created_at), 'dd/MM/yyyy')}
+                    {sale.status === 'paid' && format(new Date(), 'dd/MM/yyyy')}
                   </TableCell>
                   <TableCell align="center">
                     <Chip
