@@ -6,7 +6,6 @@ import {
   BrowserRouter as Router, 
   Routes, 
   Route, 
-  useLocation, 
   Navigate 
 } from 'react-router-dom';
 import { supabase } from './lib/supabaseClient';
@@ -16,7 +15,6 @@ import {
   SaleForm,
   SalesList,
   Dashboard,
-  PaymentReminder,
   PWAPrompt,
   Payments,
 } from './components';
@@ -285,7 +283,6 @@ function AppContent() {
     total_received: 0,
     total_pending: 0,
   });
-  const location = useLocation();
 
   useEffect(() => {
     fetchSales();

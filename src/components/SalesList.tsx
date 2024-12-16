@@ -26,14 +26,11 @@ import {
   Divider,
 } from '@mui/material';
 import { format, isWithinInterval, startOfDay, endOfDay, subDays } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonIcon from '@mui/icons-material/Person';
 import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import { Sale } from '../types';
 import { supabase } from '../lib/supabaseClient';
 import SalesFilter, { FilterOptions } from './SalesFilter';

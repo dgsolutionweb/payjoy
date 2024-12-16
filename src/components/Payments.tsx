@@ -23,7 +23,6 @@ import { ptBR } from 'date-fns/locale';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PersonIcon from '@mui/icons-material/Person';
 import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { Sale } from '../types';
@@ -46,7 +45,6 @@ const Payments = ({ sales, onMarkAsPaid }: PaymentsProps) => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const paymentGroups = useMemo(() => {
-    const today = startOfDay(new Date());
     const pendingSales = sales.filter(sale => sale.status === 'pending');
     
     // Group sales by payment_due_date
