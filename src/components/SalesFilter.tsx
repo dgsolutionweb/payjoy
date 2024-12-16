@@ -11,7 +11,6 @@ import {
   InputAdornment,
   Paper,
   Chip,
-  useTheme,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -31,8 +30,6 @@ interface SalesFilterProps {
 }
 
 const SalesFilter = ({ onFilterChange }: SalesFilterProps) => {
-  const theme = useTheme();
-  
   const [filters, setFilters] = useState<FilterOptions>({
     search: '',
     dateRange: 'all',
@@ -72,21 +69,6 @@ const SalesFilter = ({ onFilterChange }: SalesFilterProps) => {
         return 'Pago';
       default:
         return 'Todos';
-    }
-  };
-
-  const getSortLabel = (sort: string) => {
-    switch (sort) {
-      case 'sale_date':
-        return 'Data';
-      case 'total_amount':
-        return 'Valor';
-      case 'customer_name':
-        return 'Cliente';
-      case 'seller_name':
-        return 'Vendedor';
-      default:
-        return 'Data';
     }
   };
 

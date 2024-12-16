@@ -9,7 +9,6 @@ import {
   Grid,
   Divider,
   InputAdornment,
-  useTheme,
 } from '@mui/material';
 import { addDays } from 'date-fns';
 import { supabase } from '../lib/supabaseClient';
@@ -27,7 +26,6 @@ interface SaleFormProps {
 
 const SaleForm = ({ onSaleComplete, editingSale }: SaleFormProps) => {
   const navigate = useNavigate();
-  const theme = useTheme();
 
   const [formData, setFormData] = useState({
     seller_name: '',
