@@ -307,7 +307,7 @@ function AppContent() {
 
   const handleMarkAsPaid = useCallback(async (saleId: number) => {
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('sales')
         .update({
           status: 'paid',
