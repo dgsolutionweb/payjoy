@@ -1,8 +1,9 @@
 {
   "homepage": "https://dgsolutionweb.github.io/payjoy",
-  "name": "payjoy",
+  "name": "dgsolution-payjoy",
   "private": true,
   "version": "0.0.0",
+  "description": "Sistema de controle de vendas e pagamentos - DGSolution PayJoy",
   "type": "module",
   "scripts": {
     "dev": "vite",

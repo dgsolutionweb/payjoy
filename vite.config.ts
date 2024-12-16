@@ -11,8 +11,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'PayJoy - Controle de Vendas',
-        short_name: 'PayJoy',
+        name: 'DGSolution PayJoy - Controle de Vendas',
+        short_name: 'DGSolution PayJoy',
         description: 'Sistema de controle de vendas e pagamentos',
         theme_color: '#2563eb',
         background_color: '#f8fafc',
