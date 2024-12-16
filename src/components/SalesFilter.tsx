@@ -10,16 +10,13 @@ import {
   IconButton,
   InputAdornment,
   Paper,
-  Typography,
   Chip,
   useTheme,
-  useMediaQuery,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import SortIcon from '@mui/icons-material/Sort';
 import CloseIcon from '@mui/icons-material/Close';
-import { addDays, subDays, startOfDay, endOfDay } from 'date-fns';
 
 export interface FilterOptions {
   search: string;
@@ -35,7 +32,6 @@ interface SalesFilterProps {
 
 const SalesFilter = ({ onFilterChange }: SalesFilterProps) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
   const [filters, setFilters] = useState<FilterOptions>({
     search: '',

@@ -10,7 +10,6 @@ import {
   Divider,
   InputAdornment,
   useTheme,
-  useMediaQuery,
 } from '@mui/material';
 import { addDays } from 'date-fns';
 import { supabase } from '../lib/supabaseClient';
@@ -29,7 +28,6 @@ interface SaleFormProps {
 const SaleForm = ({ onSaleComplete, editingSale }: SaleFormProps) => {
   const navigate = useNavigate();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [formData, setFormData] = useState({
     seller_name: '',

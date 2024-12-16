@@ -23,7 +23,6 @@ import {
   Line,
 } from 'recharts';
 import { format, startOfMonth, eachDayOfInterval, isSameDay } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { Sale, SalesSummary } from '../types';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
@@ -107,14 +106,6 @@ const Dashboard = ({ sales, summary }: DashboardProps) => {
       currency: 'BRL',
     }).format(value);
   };
-
-  const COLORS = [
-    theme.palette.primary.main,
-    theme.palette.warning.main,
-    theme.palette.success.main,
-    theme.palette.secondary.main,
-    theme.palette.error.main,
-  ];
 
   const StatCard = ({ title, value, icon, color }: any) => (
     <Paper
@@ -259,7 +250,7 @@ const Dashboard = ({ sales, summary }: DashboardProps) => {
                     paddingAngle={5}
                     dataKey="value"
                   >
-                    {chartData.statusData.map((entry, index) => (
+                    {chartData.statusData.map((_, index) => (
                       <Cell
                         key={`cell-${index}`}
                         fill={index === 0 ? theme.palette.success.main : theme.palette.warning.main}
